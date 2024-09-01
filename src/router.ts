@@ -8,12 +8,7 @@ const routes: RouteRecordRaw[] = [
     path: '/',
     name: 'Dashboard',
     component: Dashboard,    
-  }, 
-  {
-    path: '/dashboard',
-    name: 'Dashboard',
-    component: Dashboard,    
-  },  
+  },   
   { 
     path: '/:pathMatch(.*)*',
     name: 'NotFound',

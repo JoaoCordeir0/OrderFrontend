@@ -28,13 +28,13 @@
                         <tbody>
                             <tr v-for="item in products">
                                 <td class="px-5 py-4 text-sm bg-white border-b border-gray-200">
-                                    <p class="text-gray-900 whitespace-nowrap">{{ item.Id }}</p>
+                                    <p class="text-gray-900 whitespace-nowrap">{{ item.id }}</p>
                                 </td>
                                 <td class="px-5 py-4 text-sm bg-white border-b border-gray-200">
-                                    <p class="text-gray-900 whitespace-nowrap">{{ item.ProductName }}</p>
+                                    <p class="text-gray-900 whitespace-nowrap">{{ item.productName }}</p>
                                 </td>                                
                                 <td class="px-5 py-4 text-sm bg-white border-b border-gray-200">
-                                    <p class="text-gray-900 whitespace-nowrap"><b>R$ {{ item.Value.toFixed(2) }}</b></p>
+                                    <p class="text-gray-900 whitespace-nowrap"><b>R$ {{ item.value.toFixed(2) }}</b></p>
                                 </td>                                                               
                             </tr>
                         </tbody>
@@ -70,10 +70,10 @@
                         <tbody>
                             <tr v-for="item in orders">
                                 <td class="px-5 py-4 text-sm bg-white border-b border-gray-200">
-                                    <p class="text-gray-900 whitespace-nowrap">{{ item.Id }}</p>
+                                    <p class="text-gray-900 whitespace-nowrap">{{ item.id }}</p>
                                 </td>
                                 <td class="px-5 py-4 text-sm bg-white border-b border-gray-200">
-                                    <p class="text-gray-900 whitespace-nowrap">{{ item.ClientName }}</p>
+                                    <p class="text-gray-900 whitespace-nowrap">{{ item.clientName }}</p>
                                 </td>                                
                                 <td class="px-5 py-4 text-sm bg-white border-b border-gray-200">
                                     <p class="text-gray-900 whitespace-nowrap text-center">
@@ -83,7 +83,7 @@
                                 </td>                                                           
                                 <td class="px-5 py-4 text-sm text-center bg-white border-b border-gray-200">
                                     <div class="sm:inline-block">                                        
-                                        <button v-on:click="loadOrder(item.Id)" title="View order" class="bg-gray-900 text-white rounded p-2 ps-3 pe-3 me-2 w-10">
+                                        <button v-on:click="loadOrder(item.id)" title="View order" class="bg-gray-900 text-white rounded p-2 ps-3 pe-3 me-2 w-10">
                                             <font-awesome-icon :icon="['fas', 'eye']" />
                                         </button>                                        
                                     </div>    
@@ -136,7 +136,7 @@
                         <span class="text-sm text-gray-700">Order <span class="text-red-500 font-semibold">*</span></span>
                         <select v-model="add_order" class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full">
                             <option value="0">Create new</option>    
-                            <option v-for="item in orders" v-bind:value="item.Id">{{ item.ClientName }}</option>                        
+                            <option v-for="item in orders" v-bind:value="item.id">{{ item.clientName }}</option>                        
                         </select>
                     </label>  
                     <div v-if="add_order == 0" class="">
@@ -155,7 +155,7 @@
                         <span class="text-sm text-gray-700">Product <span class="text-red-500 font-semibold">*</span></span>
                         <select v-model="add_order_product" class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full">                            
                             <option value="0">Select the product</option>   
-                            <option v-for="item in products" v-bind:value="item.Id">{{ item.ProductName }}</option>                        
+                            <option v-for="item in products" v-bind:value="item.id">{{ item.productName }}</option>                        
                         </select>
                     </label>       
                     <label class="block mt-2">
@@ -188,18 +188,18 @@
         <template #body>
             <div v-if="infoLoadedOrderDetails" class="px-5 py-5 mt-0">
                 <div class="">
-                    <p class="mb-2"><b>Order ID:</b> {{ ordersDetails.Id }}</p>
+                    <p class="mb-2"><b>Order ID:</b> {{ ordersDetails.id }}</p>
                     <hr>
-                    <p class="mt-2 mb-2"><b>Client name:</b> {{ ordersDetails.ClientName }}</p>
+                    <p class="mt-2 mb-2"><b>Client name:</b> {{ ordersDetails.clientName }}</p>
                     <hr>
-                    <p class="mt-2 mb-2"><b>Client email:</b> {{ ordersDetails.ClientEmail }}</p>
+                    <p class="mt-2 mb-2"><b>Client email:</b> {{ ordersDetails.clientEmail }}</p>
                     <hr>
                     <p class="mt-2 mb-2"><b>Paid:</b> &nbsp;
-                        <span v-if="ordersDetails.Paid" ><font-awesome-icon class="fa-xl" :icon="['fas', 'thumbs-up']" /></span>    
+                        <span v-if="ordersDetails.paid" ><font-awesome-icon class="fa-xl" :icon="['fas', 'thumbs-up']" /></span>    
                         <span v-else><font-awesome-icon class="fa-xl" :icon="['fas', 'thumbs-down']" /></span>
                     </p>
                     <hr>
-                    <p class="mt-2 mb-2"><b>Total value:</b> R$ {{ ordersDetails.TotalValue.toFixed(2) }}</p>
+                    <p class="mt-2 mb-2"><b>Total value:</b> R$ {{ ordersDetails.totalValue.toFixed(2) }}</p>
                     <hr>
                     <p class="mt-2 mb-2"><b>Items:</b></p>
                 </div>
@@ -213,18 +213,18 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="item in ordersDetails.ItemsOrder">
+                        <tr v-for="item in ordersDetails.items">
                             <td class="px-5 py-4 text-sm bg-white border-b border-gray-200">
-                                <p class="text-gray-900 text-center whitespace-nowrap">{{ item.ProductId }}</p>
+                                <p class="text-gray-900 text-center whitespace-nowrap">{{ item.productId }}</p>
                             </td>
                             <td class="px-5 py-4 text-sm bg-white border-b border-gray-200">
-                                <p class="text-gray-900 whitespace-nowrap">{{ item.ProductName }}</p>
+                                <p class="text-gray-900 whitespace-nowrap">{{ item.productName }}</p>
                             </td>                                
                             <td class="px-5 py-4 text-sm bg-white border-b border-gray-200">
-                                <p class="text-gray-900 text-center whitespace-nowrap">R$ {{ item.UnitValue.toFixed(2) }}</p>
+                                <p class="text-gray-900 text-center whitespace-nowrap">R$ {{ item.unitValue.toFixed(2) }}</p>
                             </td>  
                             <td class="px-5 py-4 text-sm bg-white border-b border-gray-200">
-                                <p class="text-gray-900 text-center whitespace-nowrap">{{ item.Amount }}</p>
+                                <p class="text-gray-900 text-center whitespace-nowrap">{{ item.amount }}</p>
                             </td>                                                         
                         </tr>
                     </tbody>
@@ -299,7 +299,7 @@ export default defineComponent({
         async loadOrder(id) {
             this.showModalOrderDetails()
             const result = await orderDetails(id)
-            this.ordersDetails = result[0]            
+            this.ordersDetails = result           
             this.infoLoadedOrderDetails = true            
         },  
         async saveProduct() {
@@ -312,11 +312,11 @@ export default defineComponent({
                 return
             }
             const result = await productAdd({
-                'ProductName': this.add_product_name,
-                'Value': this.add_product_value.replace(',', '.'),
+                'productName': this.add_product_name,
+                'value': this.add_product_value.replace(',', '.'),
             })
             
-            if (result.status == 'success') {
+            if (result.message.indexOf('success') != -1) {
                 Toast().fire({icon:'success', title:'Registered product!'})
                 this.loadProducts()
             } else {
@@ -344,14 +344,16 @@ export default defineComponent({
                 return
             }
             const result = await orderAdd({
-                'OrderId': this.add_order,
-                'ClientName': this.add_order_cli_name,
-                'ClientEmail': this.add_order_cli_email,                
-                'Paid': this.add_order_paid,
-                'ProductId': this.add_order_product,
-                'Amount': this.add_order_amount
-            })
-            if (result.status == 'success') {
+                'orderId': this.add_order,
+                'clientName': this.add_order_cli_name,
+                'clientEmail': this.add_order_cli_email,                
+                'paid': this.add_order_paid,
+                'productId': this.add_order_product,
+                'amount': this.add_order_amount,
+                'order': this.add_order,
+                'product': this.add_order_product
+            })            
+            if (result.message.indexOf('success') != -1) {
                 Toast().fire({icon:'success', title:'Registered order!'})
                 this.loadOrders()
             } else {
