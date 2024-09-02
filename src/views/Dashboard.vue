@@ -39,9 +39,12 @@
                                 </td>    
                                 <td class="px-5 py-4 text-sm text-center bg-white border-b border-gray-200">
                                     <div class="sm:inline-block">                                        
-                                        <button v-on:click="showProduct(item.id)" title="View order" class="bg-gray-900 text-white rounded p-2 ps-3 pe-3 me-2 w-10">
+                                        <button v-on:click="showProduct(item.id)" title="View product" class="bg-gray-900 text-white rounded p-2 ps-3 pe-3 me-2 w-10">
                                             <font-awesome-icon :icon="['fas', 'eye']" />
-                                        </button>                                        
+                                        </button>        
+                                        <button v-on:click="deleteProduct(item.id)" title="Delete product" class="bg-red-600 text-white rounded p-2 ps-3 pe-3 me-2 w-10">
+                                            <font-awesome-icon :icon="['fas', 'trash-can']" />
+                                        </button>                                                
                                     </div>    
                                 </td>                                                               
                             </tr>
@@ -93,7 +96,10 @@
                                     <div class="sm:inline-block">                                        
                                         <button v-on:click="loadOrder(item.id)" title="View order" class="bg-gray-900 text-white rounded p-2 ps-3 pe-3 me-2 w-10">
                                             <font-awesome-icon :icon="['fas', 'eye']" />
-                                        </button>                                        
+                                        </button>         
+                                        <button v-on:click="deleteOrder(item.id)" title="Delete order" class="bg-red-600 text-white rounded p-2 ps-3 pe-3 me-2 w-10">
+                                            <font-awesome-icon :icon="['fas', 'trash-can']" />
+                                        </button>                                                 
                                     </div>    
                                 </td>                                                               
                             </tr>
@@ -287,8 +293,9 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue"
 import Spinner from "../components/Spinner.vue"
-import { productAdd, productDetails, productEdit, productList } from "../hooks/useProduct"
-import { orderAdd, orderDetails, orderEdit, orderList } from "../hooks/useOrder"
+import Swal from "sweetalert2"
+import { productAdd, productDelete, productDetails, productEdit, productList } from "../hooks/useProduct"
+import { orderAdd, orderDelete, orderDetails, orderEdit, orderList } from "../hooks/useOrder"
 import Modal from "../components/Modal.vue"
 import { Toast } from "../hooks/useToast"
 
@@ -461,6 +468,48 @@ export default defineComponent({
                 Toast().fire({icon:'error', title:'Error when registering order!'})
             }
             this.isModalOrderDetailsVisible = false
+        },
+        async deleteProduct(id) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!"
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    const result = await productDelete(id)
+                    if (result.message.indexOf('success') != -1) {
+                        Toast().fire({icon:'success', title:'Product deleted!'})
+                        this.loadProducts()
+                    } else {
+                        Toast().fire({icon:'error', title:'Error when delete product!'})
+                    }                    
+                }
+            });                     
+        },
+        async deleteOrder(id) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!"
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    const result = await orderDelete(id)
+                    if (result.message.indexOf('success') != -1) {
+                        Toast().fire({icon:'success', title:'Order deleted!'})
+                        this.loadOrders()
+                    } else {
+                        Toast().fire({icon:'error', title:'Error when delete order!'})
+                    }
+                }
+            });                     
         },
         showModalOrderDetails() {
             this.isModalOrderDetailsVisible = !this.isModalOrderDetailsVisible

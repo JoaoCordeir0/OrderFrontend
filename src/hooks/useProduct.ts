@@ -23,3 +23,8 @@ export async function productEdit(params) {
     return data
 }
 
+export async function productDelete(id) {
+    const { data } = await axios.delete(`${endpointUrl}/api/product/${id}`)
+    return data
+}
+

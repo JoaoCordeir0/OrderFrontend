@@ -1,7 +1,7 @@
 import { createApp } from 'vue';
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faChartLine, faEye, faFloppyDisk, faPlus, faThumbsDown, faThumbsUp, faXmark } from '@fortawesome/free-solid-svg-icons'
+import { faChartLine, faEye, faFloppyDisk, faPlus, faThumbsDown, faThumbsUp, faTrashCan, faXmark } from '@fortawesome/free-solid-svg-icons'
 
 import App from './App.vue';
 import router from './router';
@@ -25,6 +25,6 @@ app.use(VueSweetalert2);
 app.use(router);
 
 /* add icons to the library */
-library.add(faChartLine, faEye, faThumbsUp, faThumbsDown, faFloppyDisk, faXmark, faPlus) 
+library.add(faChartLine, faEye, faThumbsUp, faThumbsDown, faFloppyDisk, faXmark, faPlus, faTrashCan) 
 
 app.mount('#app');
