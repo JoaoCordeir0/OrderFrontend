@@ -248,7 +248,7 @@
                         </select>
                     </p>
                     <hr>
-                    <p class="mt-3 mb-3"><b>Total value:</b> R$ {{ ordersDetails.totalValue.toFixed(2) }}</p>
+                    <p class="mt-2 mb-2 flex"><b class="mt-2 w-40">Total value:</b> <input type="text" class="block w-full ms-2 border-gray-300 rounded-md focus:border-gray-800 focus:ring focus:ring-opacity-40 focus:ring-gray-800" :value="'R$ ' + ordersDetails.totalValue.toFixed(2)" disabled/></p>                    
                     <hr>
                     <p class="mt-2 mb-2"><b>Items:</b></p>
                 </div>
