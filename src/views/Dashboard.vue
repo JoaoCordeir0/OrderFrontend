@@ -1,8 +1,8 @@
 <template>    
     <div class="mt-2 w-full">
-        <div class="grid grid-cols-2 gap-4">
-            <div>
-                <div class="bg-white border-2 rounded-xl border-gray px-5 py-5 mt-2">              
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="">
+                <div class="overflow-y-hidden bg-white border-2 rounded-xl border-gray px-5 py-5 mt-2">              
                     <div class="flex flex-wrap">                                                
                         <div class="w-full grid grid-cols-6 gap-4">                    
                             <div class="col-start-1 col-end-8 ...">
@@ -22,7 +22,8 @@
                             <tr>
                                 <th class="px-5 text-start border-b-2">ID</th>
                                 <th class="px-5 text-start border-b-2">Name</th>        
-                                <th class="px-5 text-start border-b-2">Value</th>                                                                
+                                <th class="px-5 text-start border-b-2">Value</th>             
+                                <th class="px-5 text-center border-b-2">Actions</th>                                                                
                             </tr>
                         </thead>
                         <tbody>
@@ -35,6 +36,13 @@
                                 </td>                                
                                 <td class="px-5 py-4 text-sm bg-white border-b border-gray-200">
                                     <p class="text-gray-900 whitespace-nowrap"><b>R$ {{ item.value.toFixed(2) }}</b></p>
+                                </td>    
+                                <td class="px-5 py-4 text-sm text-center bg-white border-b border-gray-200">
+                                    <div class="sm:inline-block">                                        
+                                        <button v-on:click="showProduct(item.id)" title="View order" class="bg-gray-900 text-white rounded p-2 ps-3 pe-3 me-2 w-10">
+                                            <font-awesome-icon :icon="['fas', 'eye']" />
+                                        </button>                                        
+                                    </div>    
                                 </td>                                                               
                             </tr>
                         </tbody>
@@ -43,7 +51,7 @@
             </div>
             
             <div>
-                <div class="bg-white border-2 rounded-xl border-gray px-5 py-5 mt-2">              
+                <div class="overflow-y-hidden bg-white border-2 rounded-xl border-gray px-5 py-5 mt-2">              
                     <div class="flex flex-wrap">                                                
                         <div class="w-full grid grid-cols-6 gap-4">                    
                             <div class="col-start-1 col-end-8 ...">
@@ -107,17 +115,50 @@
                     <label class="block">
                         <span class="text-sm text-gray-700">Product name <span class="text-red-500 font-semibold">*</span></span>
                         <input type="text" class="block w-full mt-1 border-gray-300 rounded-md focus:border-gray-800 focus:ring focus:ring-opacity-40 focus:ring-gray-800"
-                            v-model="add_product_name" />
+                            v-model="product_name" />
                     </label>    
                     <label class="block mt-2">
                         <span class="text-sm text-gray-700">Product value <span class="text-red-500 font-semibold">*</span></span>
                         <input type="text" class="block w-full mt-1 border-gray-300 rounded-md focus:border-gray-800 focus:ring focus:ring-opacity-40 focus:ring-gray-800"
-                            v-model="add_product_value" />
+                            v-model="product_value" />
                     </label>                        
                 </form>
                 <div class="flex justify-end">
                     <button v-on:click="saveProduct()" type="button" class="px-12 py-2 mt-3 text-sm text-center text-white bg-gray-900 rounded-md focus:outline-none font-bold">                                    
                         <font-awesome-icon :icon="['fas', 'floppy-disk']" /> &nbsp; Salvar                                   
+                    </button>                    
+                </div>            
+            </div>                     
+        </template>
+    </Modal>
+
+    <!-- Modal de edição de produtos -->
+    <Modal v-show="isModalProductEditVisible" @some-event="showModalProductEdit">
+        <template #header>
+            <p class="text-xl">Edit product</p>
+        </template>
+        <template #body>
+            <div class="px-5 py-5 mt-0">
+                <form @submit.prevent="">
+                    <label class="block">
+                        <span class="text-sm text-gray-700">Product Id</span>
+                        <input type="text" disabled class="block w-full mt-1 border-gray-300 rounded-md focus:border-gray-800 focus:ring focus:ring-opacity-40 focus:ring-gray-800"
+                            v-model="product_id" />
+                    </label>    
+                    <label class="block mt-2">
+                        <span class="text-sm text-gray-700">Product name <span class="text-red-500 font-semibold">*</span></span>
+                        <input type="text" class="block w-full mt-1 border-gray-300 rounded-md focus:border-gray-800 focus:ring focus:ring-opacity-40 focus:ring-gray-800"
+                            v-model="product_name" />
+                    </label>    
+                    <label class="block mt-2">
+                        <span class="text-sm text-gray-700">Product value <span class="text-red-500 font-semibold">*</span></span>
+                        <input type="text" class="block w-full mt-1 border-gray-300 rounded-md focus:border-gray-800 focus:ring focus:ring-opacity-40 focus:ring-gray-800"
+                            v-model="product_value" />
+                    </label>                        
+                </form>
+                <div class="flex justify-end">
+                    <button v-on:click="saveProduct()" type="button" class="px-12 py-2 mt-3 text-sm text-center text-white bg-gray-900 rounded-md focus:outline-none font-bold">                                    
+                        <font-awesome-icon :icon="['fas', 'floppy-disk']" /> &nbsp; Editar                                   
                     </button>                    
                 </div>            
             </div>                     
@@ -134,41 +175,41 @@
                 <form @submit.prevent="">
                     <label class="block">
                         <span class="text-sm text-gray-700">Order <span class="text-red-500 font-semibold">*</span></span>
-                        <select v-model="add_order" class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full">
+                        <select v-model="order" class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full">
                             <option value="0">Create new</option>    
                             <option v-for="item in orders" v-bind:value="item.id">{{ item.clientName }}</option>                        
                         </select>
                     </label>  
-                    <div v-if="add_order == 0" class="">
+                    <div v-if="order == 0" class="">
                         <label class="block mt-2">
                             <span class="text-sm text-gray-700">Client name <span class="text-red-500 font-semibold">*</span></span>
                             <input type="text" class="block w-full mt-1 border-gray-300 rounded-md focus:border-gray-800 focus:ring focus:ring-opacity-40 focus:ring-gray-800"
-                                v-model="add_order_cli_name" />
+                                v-model="order_cli_name" />
                         </label>   
                         <label class="block mt-2">
                             <span class="text-sm text-gray-700">Client email <span class="text-red-500 font-semibold">*</span></span>
                             <input type="email" class="block w-full mt-1 border-gray-300 rounded-md focus:border-gray-800 focus:ring focus:ring-opacity-40 focus:ring-gray-800"
-                                v-model="add_order_cli_email" />
+                                v-model="order_cli_email" />
                         </label>    
+                        <label class="block mt-2">
+                            <span class="text-sm text-gray-700">Payment status <span class="text-red-500 font-semibold">*</span></span>
+                            <select v-model="order_paid" class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full">
+                                <option value="0">Not paid</option>    
+                                <option value="1">Paid</option>                        
+                        </select>
+                    </label> 
                     </div>     
                     <label class="block mt-2">
                         <span class="text-sm text-gray-700">Product <span class="text-red-500 font-semibold">*</span></span>
-                        <select v-model="add_order_product" class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full">                            
+                        <select v-model="order_product" class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full">                            
                             <option value="0">Select the product</option>   
                             <option v-for="item in products" v-bind:value="item.id">{{ item.productName }}</option>                        
                         </select>
-                    </label>       
-                    <label class="block mt-2">
-                        <span class="text-sm text-gray-700">Payment status <span class="text-red-500 font-semibold">*</span></span>
-                        <select v-model="add_order_paid" class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full">
-                            <option value="0">Not paid</option>    
-                            <option value="1">Paid</option>                        
-                        </select>
-                    </label> 
+                    </label>                           
                     <label class="block mt-2">
                         <span class="text-sm text-gray-700">Amount <span class="text-red-500 font-semibold">*</span></span>
                         <input type="number" class="block w-full mt-1 border-gray-300 rounded-md focus:border-gray-800 focus:ring focus:ring-opacity-40 focus:ring-gray-800"
-                            v-model="add_order_amount" />
+                            v-model="order_amount" />
                     </label>                                  
                 </form>
                 <div class="flex justify-end">
@@ -190,12 +231,12 @@
                 <div class="">
                     <p class="mb-2"><b>Order ID:</b> {{ ordersDetails.id }}</p>
                     <hr>                    
-                    <p class="mt-2 mb-2 flex"><b class="mt-2 w-40">Client name:</b> <input type="text" class="block w-full ms-2 border-gray-300 rounded-md focus:border-gray-800 focus:ring focus:ring-opacity-40 focus:ring-gray-800" v-model="add_order_cli_name" /></p>
+                    <p class="mt-2 mb-2 flex"><b class="mt-2 w-40">Client name:</b> <input type="text" class="block w-full ms-2 border-gray-300 rounded-md focus:border-gray-800 focus:ring focus:ring-opacity-40 focus:ring-gray-800" v-model="order_cli_name" /></p>
                     <hr>
-                    <p class="mt-2 mb-2 flex"><b class="mt-2 w-40">Client email:</b> <input type="text" class="block w-full ms-2 border-gray-300 rounded-md focus:border-gray-800 focus:ring focus:ring-opacity-40 focus:ring-gray-800" v-model="add_order_cli_email" /></p>
+                    <p class="mt-2 mb-2 flex"><b class="mt-2 w-40">Client email:</b> <input type="text" class="block w-full ms-2 border-gray-300 rounded-md focus:border-gray-800 focus:ring focus:ring-opacity-40 focus:ring-gray-800" v-model="order_cli_email" /></p>
                     <hr>
                     <p class="mt-2 mb-2 flex"><b class="mt-2 w-40">Paid:</b>
-                        <select v-model="add_order_paid" class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block ms-2 w-full">
+                        <select v-model="order_paid" class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block ms-2 w-full">
                             <option value="0">Not paid</option>    
                             <option value="1">Paid</option>                        
                         </select>
@@ -233,7 +274,7 @@
                 </table>
 
                 <button v-on:click="editOrder(ordersDetails.id)" type="button" class="px-12 py-2 mt-5 text-sm text-center text-white bg-gray-900 rounded-md focus:outline-none font-bold float-end">                                    
-                    <font-awesome-icon :icon="['fas', 'floppy-disk']" /> &nbsp; Salvar                                   
+                    <font-awesome-icon :icon="['fas', 'floppy-disk']" /> &nbsp; Editar                                   
                 </button>        
             </div>   
             <div v-else class="px-5 py-5 mt-0 flex justify-center">
@@ -246,7 +287,7 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue"
 import Spinner from "../components/Spinner.vue"
-import { productAdd, productList } from "../hooks/useProduct"
+import { productAdd, productDetails, productEdit, productList } from "../hooks/useProduct"
 import { orderAdd, orderDetails, orderEdit, orderList } from "../hooks/useOrder"
 import Modal from "../components/Modal.vue"
 import { Toast } from "../hooks/useToast"
@@ -262,14 +303,16 @@ export default defineComponent({
         const isModalOrderDetailsVisible = ref(false)
         const isModalProductAddVisible = ref(false)
         const isModalOrderAddVisible = ref(false)
-        const add_product_name = ref("")
-        const add_product_value = ref("")
-        const add_order = ref(0)
-        const add_order_cli_name = ref("")
-        const add_order_cli_email = ref("")      
-        const add_order_paid = ref(0)
-        const add_order_product = ref(0)
-        const add_order_amount = ref(0)  
+        const isModalProductEditVisible = ref(false)
+        const product_id = ref()
+        const product_name = ref("")
+        const product_value = ref("")
+        const order = ref(0)
+        const order_cli_name = ref("")
+        const order_cli_email = ref("")      
+        const order_paid = ref(0)
+        const order_product = ref(0)
+        const order_amount = ref(0)  
 
         return {               
             infoLoadedProduct,
@@ -281,14 +324,16 @@ export default defineComponent({
             isModalOrderDetailsVisible,
             isModalProductAddVisible,
             isModalOrderAddVisible,
-            add_product_name,
-            add_product_value,
-            add_order,
-            add_order_cli_name,
-            add_order_cli_email,
-            add_order_paid,
-            add_order_product,
-            add_order_amount,
+            isModalProductEditVisible,
+            product_id,
+            product_name,
+            product_value,
+            order,
+            order_cli_name,
+            order_cli_email,
+            order_paid,
+            order_product,
+            order_amount,
         }
     },    
     methods: {
@@ -306,59 +351,84 @@ export default defineComponent({
             this.showModalOrderDetails()
             const result = await orderDetails(id)
             this.ordersDetails = result          
-            this.add_order_cli_name = this.ordersDetails.clientName
-            this.add_order_cli_email = this.ordersDetails.clientEmail 
-            this.add_order_paid = this.ordersDetails.paid ? 1 : 0
+            this.order_cli_name = this.ordersDetails.clientName
+            this.order_cli_email = this.ordersDetails.clientEmail 
+            this.order_paid = this.ordersDetails.paid ? 1 : 0
             this.infoLoadedOrderDetails = true            
         },  
+        async showProduct(id) {
+            const result = await productDetails(id)
+            
+            this.showModalProductEdit()                        
+            this.product_id = id
+            this.product_name = result['productName']
+            this.product_value = result['value']            
+        },
         async saveProduct() {
-            if (this.add_product_name == '' || this.add_product_name == null) {
+            if (this.product_name == '' || this.product_name == null) {
                 Toast().fire({icon:'warning', title:'Enter the product name!'})
                 return
             }
-            if (this.add_product_value == '' || this.add_product_value == null) {
+            if (this.product_value == '' || this.product_value == null) {
                 Toast().fire({icon:'warning', title:'Enter the product value!'})
                 return
             }
-            const result = await productAdd({
-                'productName': this.add_product_name,
-                'value': this.add_product_value.replace(',', '.'),
-            })
-            
-            if (result.message.indexOf('success') != -1) {
-                Toast().fire({icon:'success', title:'Registered product!'})
-                this.loadProducts()
+
+            if (this.product_id != '' && this.product_id != null) {
+                const result = await productEdit({
+                    'id': this.product_id,
+                    'productName': this.product_name,
+                    'value': this.product_value.replace(',', '.'),
+                })
+                
+                if (result.message.indexOf('success') != -1) {
+                    Toast().fire({icon:'success', title:'Updated product!'})
+                    this.loadProducts()
+                } else {
+                    Toast().fire({icon:'error', title:'Error when update product!'})
+                }
+                this.isModalProductEditVisible = false
             } else {
-                Toast().fire({icon:'error', title:'Error when registering product!'})
-            }
-            this.isModalProductAddVisible = false
+                const result = await productAdd({
+                    'productName': this.product_name,
+                    'value': this.product_value.replace(',', '.'),
+                })
+                
+                if (result.message.indexOf('success') != -1) {
+                    Toast().fire({icon:'success', title:'Registered product!'})
+                    this.loadProducts()
+                } else {
+                    Toast().fire({icon:'error', title:'Error when registering product!'})
+                }
+                this.isModalProductAddVisible = false
+            }                        
         },
         async saveOrder() {
-            if (this.add_order == 0) {
-                if (this.add_order_cli_name == '' || this.add_order_cli_name == null) {
+            if (this.order == 0) {
+                if (this.order_cli_name == '' || this.order_cli_name == null) {
                     Toast().fire({icon:'warning', title:'Enter the client name!'})
                     return
                 }
-                if (this.add_order_cli_email == '' || this.add_order_cli_email == null) {
+                if (this.order_cli_email == '' || this.order_cli_email == null) {
                     Toast().fire({icon:'warning', title:'Enter the client email!'})
                     return
                 }
             }
-            if (this.add_order_product == null || this.add_order_product < 1) {
+            if (this.order_product == null || this.order_product < 1) {
                 Toast().fire({icon:'warning', title:'Enter the product!'})
                 return
             }
-            if (this.add_order_amount == null || this.add_order_amount < 1) {
+            if (this.order_amount == null || this.order_amount < 1) {
                 Toast().fire({icon:'warning', title:'Enter the amount!'})
                 return
             }
             const result = await orderAdd({
-                'orderId': this.add_order,
-                'clientName': this.add_order_cli_name,
-                'clientEmail': this.add_order_cli_email,                
-                'paid': this.add_order_paid == 1 ? true : false,
-                'productId': this.add_order_product,
-                'amount': this.add_order_amount,                
+                'orderId': this.order,
+                'clientName': this.order_cli_name,
+                'clientEmail': this.order_cli_email,                
+                'paid': this.order_paid == 1 ? true : false,
+                'productId': this.order_product,
+                'amount': this.order_amount,                
             })            
             if (result.message.indexOf('success') != -1) {
                 Toast().fire({icon:'success', title:'Registered order!'})
@@ -369,20 +439,20 @@ export default defineComponent({
             this.isModalOrderAddVisible = false
         },
         async editOrder(id) {
-            if (this.add_order_cli_name == '' || this.add_order_cli_name == null) {
+            if (this.order_cli_name == '' || this.order_cli_name == null) {
                 Toast().fire({icon:'warning', title:'Enter the client name!'})
                 return
             }
-            if (this.add_order_cli_email == '' || this.add_order_cli_email == null) {
+            if (this.order_cli_email == '' || this.order_cli_email == null) {
                 Toast().fire({icon:'warning', title:'Enter the client email!'})
                 return
             }                        
             const result = await orderEdit({
                 'id': id,
-                'clientName': this.add_order_cli_name,
-                'clientEmail': this.add_order_cli_email,
+                'clientName': this.order_cli_name,
+                'clientEmail': this.order_cli_email,
                 'creationDate': (new Date()).toISOString(),
-                'paid': this.add_order_paid == 1 ? true : false             
+                'paid': this.order_paid == 1 ? true : false             
             })            
             if (result.message.indexOf('success') != -1) {
                 Toast().fire({icon:'success', title:'Updated order!'})
@@ -397,17 +467,23 @@ export default defineComponent({
         },
         showModalProductAdd() {
             this.isModalProductAddVisible = !this.isModalProductAddVisible
-            this.add_product_name = ''
-            this.add_product_value = ''
+            this.product_name = ''
+            this.product_value = ''
+        },
+        showModalProductEdit() {
+            this.isModalProductEditVisible = !this.isModalProductEditVisible
+            this.product_id = ''
+            this.product_name = ''
+            this.product_value = ''
         },
         showModalOrderAdd() {
             this.isModalOrderAddVisible = !this.isModalOrderAddVisible
-            this.add_order = 0
-            this.add_order_cli_name = ''
-            this.add_order_cli_email = ''
-            this.add_order_paid = 0
-            this.add_order_product = 0
-            this.add_order_amount = 0
+            this.order = 0
+            this.order_cli_name = ''
+            this.order_cli_email = ''
+            this.order_paid = 0
+            this.order_product = 0
+            this.order_amount = 0
         },
     },
     beforeMount() {
