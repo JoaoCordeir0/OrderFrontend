@@ -17,3 +17,9 @@ export async function orderAdd(params) {
     const { data } = await axios.post(`${endpointUrl}/api/order/add`, params)
     return data
 }
+
+export async function orderEdit(params) {
+    const { data } = await axios.put(`${endpointUrl}/api/order/edit`, params)
+    return data
+}
+

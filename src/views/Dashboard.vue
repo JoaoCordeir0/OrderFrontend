@@ -77,7 +77,7 @@
                                 </td>                                
                                 <td class="px-5 py-4 text-sm bg-white border-b border-gray-200">
                                     <p class="text-gray-900 whitespace-nowrap text-center">
-                                        <span v-if="item.Paid" ><font-awesome-icon class="fa-xl" :icon="['fas', 'thumbs-up']" /></span>    
+                                        <span v-if="item.paid" ><font-awesome-icon class="fa-xl" :icon="['fas', 'thumbs-up']" /></span>    
                                         <span v-else><font-awesome-icon class="fa-xl" :icon="['fas', 'thumbs-down']" /></span>
                                     </p>
                                 </td>                                                           
@@ -189,17 +189,19 @@
             <div v-if="infoLoadedOrderDetails" class="px-5 py-5 mt-0">
                 <div class="">
                     <p class="mb-2"><b>Order ID:</b> {{ ordersDetails.id }}</p>
+                    <hr>                    
+                    <p class="mt-2 mb-2 flex"><b class="mt-2 w-40">Client name:</b> <input type="text" class="block w-full ms-2 border-gray-300 rounded-md focus:border-gray-800 focus:ring focus:ring-opacity-40 focus:ring-gray-800" v-model="add_order_cli_name" /></p>
                     <hr>
-                    <p class="mt-2 mb-2"><b>Client name:</b> {{ ordersDetails.clientName }}</p>
+                    <p class="mt-2 mb-2 flex"><b class="mt-2 w-40">Client email:</b> <input type="text" class="block w-full ms-2 border-gray-300 rounded-md focus:border-gray-800 focus:ring focus:ring-opacity-40 focus:ring-gray-800" v-model="add_order_cli_email" /></p>
                     <hr>
-                    <p class="mt-2 mb-2"><b>Client email:</b> {{ ordersDetails.clientEmail }}</p>
-                    <hr>
-                    <p class="mt-2 mb-2"><b>Paid:</b> &nbsp;
-                        <span v-if="ordersDetails.paid" ><font-awesome-icon class="fa-xl" :icon="['fas', 'thumbs-up']" /></span>    
-                        <span v-else><font-awesome-icon class="fa-xl" :icon="['fas', 'thumbs-down']" /></span>
+                    <p class="mt-2 mb-2 flex"><b class="mt-2 w-40">Paid:</b>
+                        <select v-model="add_order_paid" class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block ms-2 w-full">
+                            <option value="0">Not paid</option>    
+                            <option value="1">Paid</option>                        
+                        </select>
                     </p>
                     <hr>
-                    <p class="mt-2 mb-2"><b>Total value:</b> R$ {{ ordersDetails.totalValue.toFixed(2) }}</p>
+                    <p class="mt-3 mb-3"><b>Total value:</b> R$ {{ ordersDetails.totalValue.toFixed(2) }}</p>
                     <hr>
                     <p class="mt-2 mb-2"><b>Items:</b></p>
                 </div>
@@ -228,7 +230,11 @@
                             </td>                                                         
                         </tr>
                     </tbody>
-                </table>      
+                </table>
+
+                <button v-on:click="editOrder(ordersDetails.id)" type="button" class="px-12 py-2 mt-5 text-sm text-center text-white bg-gray-900 rounded-md focus:outline-none font-bold float-end">                                    
+                    <font-awesome-icon :icon="['fas', 'floppy-disk']" /> &nbsp; Salvar                                   
+                </button>        
             </div>   
             <div v-else class="px-5 py-5 mt-0 flex justify-center">
                 <Spinner />
@@ -241,7 +247,7 @@
 import { defineComponent, ref } from "vue"
 import Spinner from "../components/Spinner.vue"
 import { productAdd, productList } from "../hooks/useProduct"
-import { orderAdd, orderDetails, orderList } from "../hooks/useOrder"
+import { orderAdd, orderDetails, orderEdit, orderList } from "../hooks/useOrder"
 import Modal from "../components/Modal.vue"
 import { Toast } from "../hooks/useToast"
 
@@ -299,7 +305,10 @@ export default defineComponent({
         async loadOrder(id) {
             this.showModalOrderDetails()
             const result = await orderDetails(id)
-            this.ordersDetails = result           
+            this.ordersDetails = result          
+            this.add_order_cli_name = this.ordersDetails.clientName
+            this.add_order_cli_email = this.ordersDetails.clientEmail 
+            this.add_order_paid = this.ordersDetails.paid ? 1 : 0
             this.infoLoadedOrderDetails = true            
         },  
         async saveProduct() {
@@ -347,11 +356,9 @@ export default defineComponent({
                 'orderId': this.add_order,
                 'clientName': this.add_order_cli_name,
                 'clientEmail': this.add_order_cli_email,                
-                'paid': this.add_order_paid,
+                'paid': this.add_order_paid == 1 ? true : false,
                 'productId': this.add_order_product,
-                'amount': this.add_order_amount,
-                'order': this.add_order,
-                'product': this.add_order_product
+                'amount': this.add_order_amount,                
             })            
             if (result.message.indexOf('success') != -1) {
                 Toast().fire({icon:'success', title:'Registered order!'})
@@ -360,6 +367,30 @@ export default defineComponent({
                 Toast().fire({icon:'error', title:'Error when registering order!'})
             }
             this.isModalOrderAddVisible = false
+        },
+        async editOrder(id) {
+            if (this.add_order_cli_name == '' || this.add_order_cli_name == null) {
+                Toast().fire({icon:'warning', title:'Enter the client name!'})
+                return
+            }
+            if (this.add_order_cli_email == '' || this.add_order_cli_email == null) {
+                Toast().fire({icon:'warning', title:'Enter the client email!'})
+                return
+            }                        
+            const result = await orderEdit({
+                'id': id,
+                'clientName': this.add_order_cli_name,
+                'clientEmail': this.add_order_cli_email,
+                'creationDate': (new Date()).toISOString(),
+                'paid': this.add_order_paid == 1 ? true : false             
+            })            
+            if (result.message.indexOf('success') != -1) {
+                Toast().fire({icon:'success', title:'Updated order!'})
+                this.loadOrders()
+            } else {
+                Toast().fire({icon:'error', title:'Error when registering order!'})
+            }
+            this.isModalOrderDetailsVisible = false
         },
         showModalOrderDetails() {
             this.isModalOrderDetailsVisible = !this.isModalOrderDetailsVisible
