@@ -376,7 +376,7 @@ export default defineComponent({
                 Toast().fire({icon:'warning', title:'Enter the product name!'})
                 return
             }
-            if (this.product_value == '' || this.product_value == null) {
+            if (this.product_value == '' || this.product_value == null || this.validValue(this.product_value)) {
                 Toast().fire({icon:'warning', title:'Enter the product value!'})
                 return
             }
@@ -480,13 +480,9 @@ export default defineComponent({
                 confirmButtonText: "Yes, delete it!"
             }).then(async (result) => {
                 if (result.isConfirmed) {
-                    const result = await productDelete(id)
-                    if (result.message.indexOf('success') != -1) {
-                        Toast().fire({icon:'success', title:'Product deleted!'})
-                        this.loadProducts()
-                    } else {
-                        Toast().fire({icon:'error', title:'Error when delete product!'})
-                    }                    
+                    await productDelete(id)
+                    this.loadProducts()
+                    Toast().fire({icon:'success', title:'Product deleted!'})
                 }
             });                     
         },
@@ -501,15 +497,18 @@ export default defineComponent({
                 confirmButtonText: "Yes, delete it!"
             }).then(async (result) => {
                 if (result.isConfirmed) {
-                    const result = await orderDelete(id)
-                    if (result.message.indexOf('success') != -1) {
-                        Toast().fire({icon:'success', title:'Order deleted!'})
-                        this.loadOrders()
-                    } else {
-                        Toast().fire({icon:'error', title:'Error when delete order!'})
-                    }
+                    await orderDelete(id)
+                    Toast().fire({icon:'success', title:'Order deleted!'})
+                    this.loadOrders()
                 }
             });                     
+        },
+        validValue(value) {
+            const regex = /^\d+(\.\d{1,2})?$/;            
+            if (regex.test(value)) {
+                return false
+            }
+            return true
         },
         showModalOrderDetails() {
             this.isModalOrderDetailsVisible = !this.isModalOrderDetailsVisible
